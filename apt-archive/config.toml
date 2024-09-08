@@ -1,0 +1,12 @@
+[[repositories]]
+name = "stable"
+architectures = [
+    "amd64",
+    "arm64",
+]
+components = [
+    "main",
+    "contrib",
+]
+suite = "stable"
+codename = "buster"

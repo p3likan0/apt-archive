@@ -1,0 +1,13 @@
+[package]
+name = "apt-archive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+debian-packaging = "0.17.0"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8.19"
+thiserror = "1.0"
+
+[dev-dependencies]
+tempdir = "0.3.7"

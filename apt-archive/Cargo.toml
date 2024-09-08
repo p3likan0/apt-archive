@@ -8,6 +8,11 @@ debian-packaging = "0.17.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8.19"
 thiserror = "1.0"
+axum = "0.7.5"
+tokio = { version = "1.40.0", features = ["full"] }
+utoipa = { features = ["axum_extras"], version = "4.2.3" }
+utoipa-swagger-ui = { features = ["axum"], version = "7.1.0" }
+
 
 [dev-dependencies]
 tempdir = "0.3.7"

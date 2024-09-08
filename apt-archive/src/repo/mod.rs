@@ -3,12 +3,13 @@ use std::path::Path;
 use debian_packaging::repository::builder::RepositoryBuilder;
 use serde::{Deserialize, Serialize};
 
-mod configuration;
+pub(crate) mod configuration;
 mod error;
+pub (crate) mod routes;
 use configuration::Configuration;
 use error::Result;
 
-#[derive(Debug, Deserialize, Serialize, Eq, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Eq, PartialEq, Clone)]
 struct Repository {
     name: String,
     architectures: Vec<String>,
@@ -29,16 +30,6 @@ impl Repository {
     }
 }
 
-pub fn create_repositories() -> Result<()> {
-    let config = Configuration::from_read_or_create_config_file(Path::new("config.toml"))?;
-    for repo in config.repositories {
-        let repo_builder = RepositoryBuilder::new_recommended(
-            repo.architectures.iter(),
-            repo.components.iter(),
-            &repo.suite,
-            &repo.codename,
-        );
-        print!("{:?}", repo_builder);
-    }
-    Ok(())
-}
+
+// Implement axum, create endpoint for returning the configuration.
+// Implement endpoint for returing repositories.

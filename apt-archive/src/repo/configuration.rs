@@ -1,19 +1,30 @@
+use core::error;
 use std::path::Path;
+use std::sync::Arc;
 
+use axum::extract::State;
+use axum::Json;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
+use crate::SharedState;
 
 use super::Repository;
 use super::error::Result;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct Configuration {
     pub repositories: Vec<Repository>,
+    pub server_ip: String,
+    pub server_port: u16,
 }
 
 impl Configuration {
     fn default() -> Self {
         Configuration {
             repositories: vec![Repository::default()],
+            server_ip: "0.0.0.0".to_owned(),
+            server_port: 3000,
         }
     }
 
@@ -39,6 +50,7 @@ impl Configuration {
         Ok(config)
     }
 }
+
 
 
 #[cfg(test)]

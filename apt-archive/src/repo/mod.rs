@@ -1,21 +1,19 @@
-use std::path::Path;
-
-use debian_packaging::repository::builder::RepositoryBuilder;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 pub(crate) mod configuration;
 mod error;
 pub (crate) mod routes;
-use configuration::Configuration;
-use error::Result;
+pub (crate) mod publicate;
 
-#[derive(Debug, Deserialize, Serialize, Eq, PartialEq, Clone)]
-struct Repository {
-    name: String,
-    architectures: Vec<String>,
-    components: Vec<String>,
-    suite: String,
-    codename: String,
+#[derive(Debug, Deserialize, Serialize, Eq, PartialEq, Clone, ToSchema, derive_more::Display)]
+#[display(fmt = "{:#?}", self)]
+pub struct Repository {
+    pub name: String,
+    pub architectures: Vec<String>,
+    pub components: Vec<String>,
+    pub suite: String,
+    pub codename: String,
 }
 
 impl Repository {
@@ -30,6 +28,3 @@ impl Repository {
     }
 }
 
-
-// Implement axum, create endpoint for returning the configuration.
-// Implement endpoint for returing repositories.

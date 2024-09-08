@@ -1,18 +1,17 @@
-use core::error;
 use std::path::Path;
-use std::sync::Arc;
 
-use axum::extract::State;
-use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::SharedState;
+use super::error::RepoError::{
+    EmptyArchitecture, EmptyComponent, RepositoryNotPresentInConfiguration,
+};
 
-use super::Repository;
 use super::error::Result;
+use super::Repository;
 
-#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema, derive_more::Display)]
+#[display(fmt = "{:#?}", self)]
 pub struct Configuration {
     pub repositories: Vec<Repository>,
     pub server_ip: String,
@@ -49,13 +48,36 @@ impl Configuration {
         let config: Configuration = toml::from_str(&config).expect("Could not parse config file");
         Ok(config)
     }
+
+    pub fn validate_repositories_exists(&self, repos: &Vec<Repository>) -> Result<()> {
+        for repo in repos {
+            if repo.architectures.is_empty() {
+                return Err(EmptyArchitecture(repo.clone()));
+            }
+            if repo.components.is_empty() {
+                return Err(EmptyComponent(repo.clone()));
+            }
+            if self
+                .repositories
+                .iter()
+                .find(|r| r.name == repo.name)
+                .is_none()
+            {
+                return Err(RepositoryNotPresentInConfiguration(
+                    repo.clone(),
+                    self.clone(),
+                ));
+            }
+        }
+        Ok(())
+    }
 }
-
-
 
 #[cfg(test)]
 mod tests {
     use tempdir::TempDir;
+
+    use crate::repo::error::RepoError;
 
     use super::*;
 
@@ -118,5 +140,94 @@ mod tests {
         assert_eq!(repository, &default_repo);
         assert!(config_path.exists());
         std::fs::remove_file(config_path).unwrap();
+    }
+    #[test]
+    fn test_validate_repositories_exists_valid() {
+        let repo1 = Repository {
+            name: "repo1".to_owned(),
+            architectures: vec!["amd64".to_owned()],
+            components: vec!["main".to_owned()],
+            suite: "stable".to_owned(),
+            codename: "buster".to_owned(),
+        };
+        let repo2 = Repository {
+            name: "repo2".to_owned(),
+            architectures: vec!["arm64".to_owned()],
+            components: vec!["contrib".to_owned()],
+            suite: "unstable".to_owned(),
+            codename: "bullseye".to_owned(),
+        };
+        let config = Configuration {
+            repositories: vec![repo1.clone(), repo2.clone()],
+            server_ip: "0.0.0.0".to_owned(),
+            server_port: 3000,
+        };
+        let repos = vec![repo1, repo2];
+        let result = config.validate_repositories_exists(&repos);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_validate_repositories_exists_empty_architecture() {
+        let repo1 = Repository {
+            name: "repo1".to_owned(),
+            architectures: vec![],
+            components: vec!["main".to_owned()],
+            suite: "stable".to_owned(),
+            codename: "buster".to_owned(),
+        };
+        let config = Configuration {
+            repositories: vec![repo1.clone()],
+            server_ip: "0.0.0.0".to_owned(),
+            server_port: 3000,
+        };
+        let repos = vec![repo1];
+        let result = config.validate_repositories_exists(&repos);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_validate_repositories_exists_empty_component() {
+        let repo1 = Repository {
+            name: "repo1".to_owned(),
+            architectures: vec!["amd64".to_owned()],
+            components: vec![],
+            suite: "stable".to_owned(),
+            codename: "buster".to_owned(),
+        };
+        let config = Configuration {
+            repositories: vec![repo1.clone()],
+            server_ip: "0.0.0.0".to_owned(),
+            server_port: 3000,
+        };
+        let repos = vec![repo1];
+        let result = config.validate_repositories_exists(&repos);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_validate_repositories_exists_repository_not_present() {
+        let repo1 = Repository {
+            name: "repo1".to_owned(),
+            architectures: vec!["amd64".to_owned()],
+            components: vec!["main".to_owned()],
+            suite: "stable".to_owned(),
+            codename: "buster".to_owned(),
+        };
+        let repo2 = Repository {
+            name: "repo2".to_owned(),
+            architectures: vec!["arm64".to_owned()],
+            components: vec!["contrib".to_owned()],
+            suite: "unstable".to_owned(),
+            codename: "bullseye".to_owned(),
+        };
+        let config = Configuration {
+            repositories: vec![repo1.clone()],
+            server_ip: "0.0.0.0".to_owned(),
+            server_port: 3000,
+        };
+        let repos = vec![repo2];
+        let result = config.validate_repositories_exists(&repos);
+        assert!(result.is_err());
     }
 }

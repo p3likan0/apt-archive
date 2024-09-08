@@ -1,5 +1,7 @@
 use axum::{http::StatusCode, response::{IntoResponse, Response}};
 
+use super::{configuration::Configuration, Repository};
+
 
 #[derive(thiserror::Error, Debug)]
 pub enum RepoError {
@@ -8,6 +10,18 @@ pub enum RepoError {
 
     #[error("Could not serialize config, error:{0}")]
     CouldNotSerializeConfigFile(#[from] toml::ser::Error),
+
+    #[error("Empty architecture for repo: {0}")]
+    EmptyArchitecture(Repository),
+
+    #[error("Empty component for repo: {0}")]
+    EmptyComponent(Repository),
+
+    #[error("Repository:{0} not present in config: {1}")]
+    RepositoryNotPresentInConfiguration(Repository, Configuration),
+
+    #[error("Debian error: {0}")]
+    DebianError(#[from] debian_packaging::error::DebianError),
 }
 impl IntoResponse for RepoError {
     fn into_response(self) -> Response {

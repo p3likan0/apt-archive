@@ -13,6 +13,7 @@ tokio = { version = "1.40.0", features = ["full"] }
 utoipa = { features = ["axum_extras"], version = "4.2.3" }
 utoipa-swagger-ui = { features = ["axum"], version = "7.1.0" }
 derive_more = "0.99.18"
+futures = "0.3.30"
 
 
 [dev-dependencies]

@@ -44,7 +44,7 @@ async fn handler_post_publish_repositories(
     State(shared_state): State<Arc<SharedState>>,
     Json(repositories): Json<Vec<Repository>>,
 ) -> Result<(), super::error::RepoError> {
-    shared_state.config.validate_repositories_exists(&repositories)?;
+    //shared_state.config.validate_repositories_exists(&repositories)?;
     publicate_repositories(&repositories, &shared_state.config).await?;
     Ok(())
 }

@@ -1,4 +1,5 @@
 use axum::{http::StatusCode, response::{IntoResponse, Response}};
+use tokio::task::JoinError;
 
 use super::{configuration::Configuration, Repository};
 
@@ -22,6 +23,9 @@ pub enum RepoError {
 
     #[error("Debian error: {0}")]
     DebianError(#[from] debian_packaging::error::DebianError),
+
+    #[error("Join error: {0}")]
+    TaskFailed(#[from] JoinError),
 }
 impl IntoResponse for RepoError {
     fn into_response(self) -> Response {

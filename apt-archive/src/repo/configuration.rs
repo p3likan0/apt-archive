@@ -14,6 +14,7 @@ use super::Repository;
 #[display(fmt = "{:#?}", self)]
 pub struct Configuration {
     pub repositories: Vec<Repository>,
+    pub repo_root_path: String,
     pub server_ip: String,
     pub server_port: u16,
 }
@@ -24,6 +25,7 @@ impl Configuration {
             repositories: vec![Repository::default()],
             server_ip: "0.0.0.0".to_owned(),
             server_port: 3000,
+            repo_root_path: "".to_owned(),
         }
     }
 
@@ -161,6 +163,7 @@ mod tests {
             repositories: vec![repo1.clone(), repo2.clone()],
             server_ip: "0.0.0.0".to_owned(),
             server_port: 3000,
+            repo_root_path: "".to_owned(),
         };
         let repos = vec![repo1, repo2];
         let result = config.validate_repositories_exists(&repos);
@@ -180,6 +183,7 @@ mod tests {
             repositories: vec![repo1.clone()],
             server_ip: "0.0.0.0".to_owned(),
             server_port: 3000,
+            repo_root_path: "".to_owned(),
         };
         let repos = vec![repo1];
         let result = config.validate_repositories_exists(&repos);
@@ -199,6 +203,7 @@ mod tests {
             repositories: vec![repo1.clone()],
             server_ip: "0.0.0.0".to_owned(),
             server_port: 3000,
+            repo_root_path: "".to_owned(),
         };
         let repos = vec![repo1];
         let result = config.validate_repositories_exists(&repos);
@@ -225,6 +230,7 @@ mod tests {
             repositories: vec![repo1.clone()],
             server_ip: "0.0.0.0".to_owned(),
             server_port: 3000,
+            repo_root_path: "".to_owned(),
         };
         let repos = vec![repo2];
         let result = config.validate_repositories_exists(&repos);

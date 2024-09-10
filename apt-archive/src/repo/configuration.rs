@@ -79,7 +79,6 @@ impl Configuration {
 mod tests {
     use tempdir::TempDir;
 
-    use crate::repo::error::RepoError;
 
     use super::*;
 

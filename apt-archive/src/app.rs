@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use axum::{routing::get, Router};
+use axum::Router;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::{openapi::ApiDoc, repo::{self, configuration::Configuration, routes::{handler_get_configuration, handler_get_repositories}}, SharedState};
+use crate::{openapi::ApiDoc, repo::{self, configuration::Configuration}, SharedState};
 
 
 pub fn create_app(config: &Configuration) -> Router {

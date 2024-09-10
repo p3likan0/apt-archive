@@ -1,8 +1,0 @@
-Acquire-By-Hash: yes
-Architectures: amd64 arm64
-Codename: buster
-Components: contrib main
-Date: Tue, 10 Sep 2024 20:35:48 +0000
-Suite: stable
-MD5Sum: 
-SHA256: 
